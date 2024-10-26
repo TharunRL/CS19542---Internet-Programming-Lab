@@ -2,10 +2,10 @@
 session_start(); // Start the session to access session variables
 
 // Database configuration
-$servername = "localhost"; // Change as needed
-$username = "root"; // Your MySQL username
-$password = ""; // Your MySQL password
-$dbname = "chathat"; // Your database name
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "chathat";
 
 // Create a connection to the database
 $conn = mysqli_connect($servername, $username, $password, $dbname);
@@ -16,31 +16,34 @@ if (!$conn) {
 
 
 // Check if the form is submitted
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get the message and receiver ID from the form
-    $message = $_POST['msg'];
-    $receiverId = $_POST['receiverid'];// Assuming you pass the receiver ID through the hidden input
+    $message = isset($_POST['msg']) ? $_POST['msg'] : '';
+    $receiverid = isset($_POST['receiverid']) ? (int)$_POST['receiverid'] : 0;
 
-    // Get the sender ID from the session (make sure you set this during login)
-    $senderId = $_SESSION['userid']; // Replace with the correct session variable for the logged-in user ID
+    // Get the sender ID from the session (assuming the user is logged in)
+    $senderId = $_SESSION['userid']; // Replace with correct session variable
+
     // Validate inputs
-    if (!empty($message) && $receiverId > 0 && $senderId) {
-        // Prepare the SQL statement to prevent SQL injection
+    if (!empty($message) && $receiverid > 0 && $senderId) {
+        // Prepare the SQL statement
         $stmt = $conn->prepare("INSERT INTO chats (senderid, receiverid, chat, time) VALUES (?, ?, ?, NOW())");
-        $stmt->bind_param("iis", $senderId, $receiverId, $message); // "iis" means: integer, integer, string
+        $stmt->bind_param("iis", $senderId, $receiverid, $message); // "iis" means integer, integer, string
 
         // Execute the statement
         if ($stmt->execute()) {
-            // Redirect back to the chat page or display a success message
-            header("Location : home.php"); // Redirect to chat page with success message
-            exit;
+            // Return success response
+            echo json_encode(['status' => 'success', 'message' => 'Chat message inserted successfully']);
         } else {
-            echo "Error: " . $stmt->error;
+            echo json_encode(['status' => 'error', 'message' => 'Failed to insert chat message']);
         }
 
         // Close the statement
         $stmt->close();
-
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Invalid input']);
     }
+}
 
 // Close the database connection
 $conn->close();

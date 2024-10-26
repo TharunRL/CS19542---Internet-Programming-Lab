@@ -25,7 +25,7 @@ JOIN
 WHERE 
     chats.senderid = ? OR chats.receiverid = ?
 ORDER BY 
-    chats.time DESC;
+    chats.time ASC;
 ";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("ii", $userId, $userId);

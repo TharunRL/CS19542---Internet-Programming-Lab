@@ -1,4 +1,3 @@
-
 function fetchChats(id) {
     $.ajax({
         url: 'fetch_chats.php', 
@@ -43,6 +42,7 @@ function fetchChats(id) {
                 </li>`);
                 
             });
+            $('.f1').empty();
             $('.f1').append(`<input type="hidden" class="hidid" name="receiverid" value=`+id+` >`)
             
         },
@@ -87,29 +87,45 @@ function fetchUsers() {
             console.error('Failed to fetch chats.');
         }
     });
-
-    // $(document).ready(function() {
-    //     $('.user2').on('click', function() {
-    //         var userId = $(this).data('userid'); // Get user ID from data attribute
-    //         fetchChats(userId); // Call fetchChats with the user ID
-    //     });
-    // });
 }
+$(document).ready(function() {
+  // Handle form submission
+  $('#chatForm').on('submit', function(e) {
+      e.preventDefault(); // Prevent the default form submission
 
-// fetchChats();
+      // Collect form data
+      var formData = {
+          msg: $('textarea[name="msg"]').val(),
+          receiverid: $('.hidid').val()
+      };
 
-// // Fetch chats every 5 seconds
-// setInterval(fetchChats, 5000);
+      // Send an AJAX request to insert the chat
+      $.ajax({
+          url: 'insertchat.php', // PHP script to handle the insert
+          type: 'POST',
+          data: formData,
+          success: function(response) {
+              // Clear the form on success
+              $('textarea[name="msg"]').val('');
+
+              // Optionally, fetch the latest chats to display
+              fetchChats($('.hidid').val());
+              selected=$('.hidid').val();
+          },
+          error: function(jqXHR, textStatus, errorThrown) {
+              console.error('Error inserting chat:', textStatus, errorThrown);
+          }
+      });
+  });
+});
+
+function chat(){
+  i=$('.hidid').val();
+  if(i!=0){
+    fetchChats(i);
+  }
+} 
+fetchUsers();
 setInterval(fetchUsers, 2000);
+setInterval(chat,1000);
 
-// Handle chat form submission
-// $('#chat-form').submit(function(event) {
-//     event.preventDefault(); // Prevent the default form submission
-
-//     // Send the chat message to the server
-//     const message = $('#chat-message').val();
-//     $.post('send_chat.php', { message: message }, function() {
-//         $('#chat-message').val(''); // Clear the input
-//         fetchChats(); // Optionally fetch chats again to show the new message
-//     });
-// });

@@ -239,9 +239,9 @@ if (!isset($_SESSION['userid'])) {
               </ul>
               <form action="insertchat.php" method="post" id="chatForm" name="chatForm" >
               <div class="mb-3">
-                  <div data-mdb-input-init class="form-outline form-white f1">
+                  <div data-mdb-input-init class="form-outline form-white">
                     <textarea class="form-control bg-transparent" name="msg" rows="4" placeholder="Message"></textarea>
-                    
+                    <div class='f1'></div>
                   </div>
               </div>
                 <button  type="submit"  data-mdb-button-init data-mdb-ripple-init class="btn btn-light btn-lg btn-rounded float-end">Send</button>
